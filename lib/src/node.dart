@@ -202,7 +202,17 @@ class MapNode extends Node {
     final List<String> lines = [];
 
     for (final entry in subnodesMap.entries) {
-      final key = entry.key;
+      String key = entry.key;
+      if (!StringNode.isValidUnquotedString(key)) {
+        switch (context.config.quoteStyle) {
+          case QuoteStyle.singleQuote:
+            key = "'${key.replaceAll("'", "''")}'";
+            break;
+          case QuoteStyle.doubleQuote:
+            key = '"${key.replaceAll(r'\', r'\\').replaceAll('"', r'\"')}"';
+            break;
+        }
+      }
       final node = entry.value;
 
       final nodeYaml = node.toYaml(context);
